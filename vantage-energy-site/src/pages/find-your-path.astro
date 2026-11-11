@@ -1,0 +1,173 @@
+---
+import Base from '../layouts/Base.astro';
+import BookingForm from '../components/BookingForm.astro';
+import PathMap from '../components/PathMap.astro';
+import Ph from '../components/Ph.astro';
+import data from '../data/find-your-path.json';
+import { site } from '../data/site.js';
+
+const { questions, results, meta } = data;
+const total = questions.length;
+
+// Where "Back" goes when JavaScript is off: the question that leads here.
+const parentOf = {};
+questions.forEach((q) => q.answers.forEach((a) => { parentOf[a.goto] ??= q.id; }));
+
+const [noteBefore, noteAfter] = meta.footnote.split('{date}');
+---
+<Base
+  title="Find your path"
+  description="Answer a few yes-or-no questions to see how your Denver building can comply with Energize Denver."
+>
+  <section class="wrap pb-14 pt-8 md:pb-20 md:pt-12">
+    <div class="cols">
+      <div class="col-span-full lg:col-span-7">
+        <h1 class="ui mb-6 text-lg font-bold leading-tight md:mb-8" style="letter-spacing: 0; font-stretch: 104%;">Find your path</h1>
+
+        <div data-flow>
+          {questions.map((q, i) => (
+            <section id={q.id} data-step data-kind="question" aria-labelledby={`${q.id}-h`}>
+              <div class="ui mb-5 flex min-h-11 flex-wrap items-center gap-x-6 gap-y-2 text-base font-semibold">
+                {parentOf[q.id] && <a href={`#${parentOf[q.id]}`} data-back>Back</a>}
+                <span>Question {i + 1} of {total}</span>
+                <ol class="progress" aria-hidden="true">
+                  {questions.map((_, k) => (
+                    <li class:list={[k < i && 'is-done', k === i && 'is-now']}>
+                      <span class="dot"></span>
+                      {k < total - 1 && <span class="seg"></span>}
+                    </li>
+                  ))}
+                </ol>
+              </div>
+              <h2 id={`${q.id}-h`} tabindex="-1" class="max-w-[22ch]">{q.text}</h2>
+              {q.hint && <p class="measure mt-4">{q.hint}</p>}
+              <ul class:list={['mt-8 grid gap-3', q.answers.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2']}>
+                {q.answers.map((a) => (
+                  <li><a class="answer" href={`#${a.goto}`}>{a.label}</a></li>
+                ))}
+              </ul>
+            </section>
+          ))}
+
+          {results.map((r) => (
+            <section id={r.id} data-step data-kind="result" aria-labelledby={`${r.id}-h`}>
+              <div class="ui mb-5 flex min-h-11 flex-wrap items-center gap-x-6 gap-y-2 text-base font-semibold">
+                <a href={`#${parentOf[r.id] ?? data.start}`} data-back>Back</a>
+                <span>Your result</span>
+              </div>
+              <h2 id={`${r.id}-h`} tabindex="-1" class="max-w-[20ch]">{r.title}</h2>
+              <div class="measure mt-5 grid gap-3">
+                {r.body.map((p) => <p>{p}</p>)}
+              </div>
+              <h3 class="mt-8">What we handle for you</h3>
+              <ul class="measure mt-3 grid gap-2">
+                {r.handle.map((item) => (
+                  <li class="relative pl-7 before:absolute before:left-0 before:top-[0.55em] before:h-2.5 before:w-4 before:border-y-2 before:border-ink before:bg-tag">{item}</li>
+                ))}
+              </ul>
+              <p class="mt-8">
+                <a class="btn w-full md:w-auto" href="#book" data-book>{site.cta}</a>
+              </p>
+              {r.showExtensionLink && (
+                <p class="small measure mt-6"><a href={meta.extensionUrl} rel="noopener">{meta.extensionText}</a></p>
+              )}
+              <p class="small ui mt-4 font-semibold"><a href={`#${data.start}`}>Start over</a></p>
+            </section>
+          ))}
+        </div>
+      </div>
+
+      <div class="col-span-full mt-12 border-2 border-ink bg-wash p-5 md:p-8 lg:col-span-5 lg:col-start-8 lg:mt-0 lg:self-start lg:p-7" id="book" data-booking>
+        <h2 class="text-[1.625rem] md:text-[2rem]" tabindex="-1">{site.cta}</h2>
+        <p class="measure mb-6 mt-3">Tell us about the building. We look it up in the City's records and get back to you.</p>
+        <BookingForm id="path" source="find-your-path" stacked />
+      </div>
+    </div>
+
+    <details class="mt-12">
+      <summary class="ui inline-flex min-h-11 items-center text-lg font-bold underline decoration-2 underline-offset-4">See the whole map</summary>
+      <div class="mt-6">
+        <p class="small mb-5" data-js-only>
+          <span class="mr-2 inline-block h-2.5 w-7 border-y-2 border-ink bg-tag align-middle"></span>Yellow marks the path you've taken so far.
+        </p>
+        <PathMap variant="compact" class="lg:hidden" />
+        <PathMap variant="wide" class="hidden lg:block" />
+      </div>
+    </details>
+
+    <p class="small measure mt-12 border-t border-rule pt-6 text-soft">
+      {noteBefore}<Ph text={meta.guidanceDate} />{noteAfter}{' '}
+      <a href={meta.cityUrl} rel="noopener">energizedenver.org</a>
+    </p>
+  </section>
+</Base>
+
+<script>
+  import data from '../data/find-your-path.json';
+
+  const steps = [...document.querySelectorAll('[data-step]')];
+  const byId = Object.fromEntries(steps.map((s) => [s.id, s]));
+  const booking = document.querySelector('[data-booking]');
+  const kids = Object.fromEntries(data.questions.map((q) => [q.id, q.answers.map((a) => a.goto)]));
+  const resultTitle = Object.fromEntries(data.results.map((r) => [r.id, r.title]));
+  let trail = [];
+
+  // Shortest route from the first question to any screen (used when someone lands on a link).
+  function routeTo(target) {
+    const queue = [[data.start]];
+    while (queue.length) {
+      const route = queue.shift();
+      const last = route[route.length - 1];
+      if (last === target) return route;
+      (kids[last] || []).forEach((next) => queue.push([...route, next]));
+    }
+    return [target];
+  }
+
+  function show(id, moveFocus) {
+    const step = byId[id];
+    if (!step) return;
+
+    const at = trail.indexOf(id);
+    if (at > -1) trail = trail.slice(0, at + 1);
+    else if (trail.length && (kids[trail[trail.length - 1]] || []).includes(id)) trail.push(id);
+    else trail = routeTo(id);
+
+    steps.forEach((s) => { s.hidden = s !== step; });
+    const isResult = step.dataset.kind === 'result';
+    booking.hidden = !isResult;
+    document.querySelectorAll('[data-path-result]').forEach((field) => { field.value = isResult ? resultTitle[id] : ''; });
+
+    const back = step.querySelector('[data-back]');
+    if (back && trail.length > 1) back.setAttribute('href', '#' + trail[trail.length - 2]);
+
+    const onNodes = new Set(trail);
+    const onEdges = new Set(trail.slice(1).map((node, i) => trail[i] + '>' + node));
+    document.querySelectorAll('[data-map] [data-node]').forEach((el) => el.classList.toggle('on', onNodes.has(el.dataset.node)));
+    document.querySelectorAll('[data-map] [data-edge]').forEach((el) => el.classList.toggle('on', onEdges.has(el.dataset.edge)));
+
+    const heading = step.querySelector('h2');
+    document.title = heading.textContent.trim() + ' | Find your path | Vantage Energy';
+    if (moveFocus) {
+      const top = document.querySelector('[data-flow]').getBoundingClientRect().top + window.scrollY - 96;
+      if (window.scrollY > top) window.scrollTo(0, Math.max(0, top));
+      heading.focus({ preventScroll: true });
+    }
+  }
+
+  const current = () => (byId[location.hash.slice(1)] ? location.hash.slice(1) : data.start);
+  window.addEventListener('hashchange', () => {
+    if (byId[location.hash.slice(1)] || location.hash === '') show(current(), true);
+  });
+  show(current(), false);
+
+  // "Book a free compliance check" on a result jumps to the form without leaving the result.
+  document.querySelectorAll('[data-book]').forEach((link) => {
+    link.addEventListener('click', (event) => {
+      event.preventDefault();
+      const calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      booking.scrollIntoView({ behavior: calm ? 'auto' : 'smooth', block: 'start' });
+      booking.querySelector('input:not([type="hidden"]):not([tabindex="-1"])').focus({ preventScroll: true });
+    });
+  });
+</script>

@@ -1,0 +1,220 @@
+{
+  "_howToEdit": [
+    "This one file drives the Find Your Path quiz, the 'See the whole map' flowchart, and the question teaser on the homepage.",
+    "Each answer's 'goto' must match the 'id' of a question or a result in this file.",
+    "'mapLabel' is the short text shown in the flowchart. Keep it under about 40 characters.",
+    "After editing, rebuild the site (npm run build) or push to Netlify and it rebuilds for you."
+  ],
+
+  "meta": {
+    "guidanceDate": "[PLACEHOLDER: date]",
+    "footnote": "Based on Energize Denver small-building guidance as of {date}. The City makes the final eligibility determination.",
+    "cityUrl": "https://www.energizedenver.org",
+    "extensionText": "Need more time? Extensions are available for situations like a pending sale, high vacancy, or budget approval cycles.",
+    "extensionUrl": "https://www.energizedenver.org/small-buildings"
+  },
+
+  "start": "q1",
+
+  "questions": [
+    {
+      "id": "q1",
+      "text": "Is your building between 5,000 and 24,999 sq ft?",
+      "hint": "Go by the total floor area of the whole building, not one unit or tenant space.",
+      "mapLabel": "Between 5,000 and 24,999 sq ft?",
+      "answers": [
+        { "label": "Yes", "mapLabel": "Yes", "goto": "q2" },
+        { "label": "No, it's under 5,000", "mapLabel": "Under 5,000", "goto": "result-under" },
+        { "label": "No, it's 25,000 or more", "mapLabel": "25,000 or more", "goto": "result-over" },
+        { "label": "Not sure", "mapLabel": "Not sure", "goto": "result-lookup" }
+      ]
+    },
+    {
+      "id": "q2",
+      "text": "Are at least 97% of your light fixtures already LED?",
+      "hint": "Count every fixture: inside, outside, and in parking areas.",
+      "mapLabel": "At least 97% of fixtures already LED?",
+      "answers": [
+        { "label": "Yes", "mapLabel": "Yes", "goto": "result-a" },
+        { "label": "No", "mapLabel": "No", "goto": "q3" },
+        { "label": "Not sure", "mapLabel": "Not sure", "goto": "result-site-walk" }
+      ]
+    },
+    {
+      "id": "q3",
+      "text": "Is it a restaurant?",
+      "hint": "If only part of the building is a restaurant, choose Not sure.",
+      "mapLabel": "Is it a restaurant?",
+      "answers": [
+        { "label": "Yes", "mapLabel": "Yes", "goto": "result-b" },
+        { "label": "No", "mapLabel": "No", "goto": "q4" },
+        { "label": "Not sure", "mapLabel": "Not sure", "goto": "result-site-walk" }
+      ]
+    },
+    {
+      "id": "q4",
+      "text": "Is it a condo building with shared common spaces?",
+      "hint": "Common spaces are areas like lobbies, hallways, laundry rooms, and parking.",
+      "mapLabel": "Condo building with shared common spaces?",
+      "answers": [
+        { "label": "Yes", "mapLabel": "Yes", "goto": "result-c" },
+        { "label": "No", "mapLabel": "No", "goto": "q5" },
+        { "label": "Not sure", "mapLabel": "Not sure", "goto": "result-site-walk" }
+      ]
+    },
+    {
+      "id": "q5",
+      "text": "Do you have a gas furnace or rooftop unit near the end of its life?",
+      "hint": "If it's old, unreliable, or due for replacement soon, answer Yes.",
+      "mapLabel": "Gas furnace or rooftop unit near the end of its life?",
+      "answers": [
+        { "label": "Yes", "mapLabel": "Yes", "goto": "result-d" },
+        { "label": "No", "mapLabel": "No", "goto": "result-e" },
+        { "label": "Not sure", "mapLabel": "Not sure", "goto": "result-site-walk" }
+      ]
+    }
+  ],
+
+  "results": [
+    {
+      "id": "result-under",
+      "title": "You're okay.",
+      "mapLabel": "You're okay",
+      "body": [
+        "Energize Denver's requirements start at 5,000 sq ft, so they don't apply to a building this size.",
+        "The City goes by the square footage in its own records. If your building is close to 5,000 sq ft, it's worth confirming the number on file."
+      ],
+      "handle": [
+        "Look up your building in the City's records",
+        "Confirm the square footage on file"
+      ],
+      "showExtensionLink": false
+    },
+    {
+      "id": "result-over",
+      "title": "Larger buildings follow different rules. Let's talk.",
+      "mapLabel": "Different rules. Let's talk",
+      "body": [
+        "Buildings 25,000 sq ft and larger report their energy use to the City every year and work toward an energy target.",
+        "The options on this page are for small buildings, so the plan for yours will look different. Tell us about the building and we'll talk it through."
+      ],
+      "handle": [
+        "Look up where your building stands with the City",
+        "Talk through what the rules mean for your building"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-lookup",
+      "title": "We'll look it up for you.",
+      "mapLabel": "We'll look it up for you",
+      "body": [
+        "The City keeps a record of every covered building, including its square footage and deadline.",
+        "Give us the address and we'll check what's on file."
+      ],
+      "handle": [
+        "Find your building in the City's records",
+        "Confirm its size, deadline, and current status",
+        "Tell you which of these questions apply to you"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-a",
+      "letter": "A",
+      "title": "You may already comply.",
+      "mapLabel": "You may already comply",
+      "body": [
+        "If at least 97% of your fixtures are LED, your building may already meet the lighting requirement.",
+        "The City still needs to see it documented. We verify it and file the paperwork."
+      ],
+      "handle": [
+        "Count and document every fixture",
+        "Complete the City's lighting verification",
+        "File it with the City and send you a copy"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-b",
+      "letter": "B",
+      "title": "Restaurant option",
+      "mapLabel": "Restaurant option",
+      "body": [
+        "Restaurants have their own way to comply.",
+        "Replace one gas kitchen appliance (fryer, griddle, combination or convection oven, steam cooker, or the kitchen water heater) with an electric one, or complete the City's restaurant efficiency checklist.",
+        "We look at your kitchen and tell you which is simpler."
+      ],
+      "handle": [
+        "Review your kitchen equipment",
+        "Install the electric replacement through licensed, insured contractors",
+        "Document the work and file it with the City"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-c",
+      "letter": "C",
+      "title": "Condo option",
+      "mapLabel": "Condo option",
+      "body": [
+        "Condo buildings can comply through their shared spaces.",
+        "That means 100% LED lighting in common areas (lobbies, halls, laundry, parking, exterior, exit signs), plus occupancy sensors where code allows."
+      ],
+      "handle": [
+        "Survey every common-area fixture",
+        "Install LED fixtures and sensors through licensed, insured contractors",
+        "Complete the verification and file it with the City"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-d",
+      "letter": "D",
+      "title": "Electrification option",
+      "mapLabel": "Electrification option",
+      "body": [
+        "Replacing one gas furnace or rooftop unit with a heat pump is one way to comply.",
+        "We also compare it against an LED retrofit and recommend the cheaper path."
+      ],
+      "handle": [
+        "Inspect the heating equipment and the lighting",
+        "Price both paths and recommend the cheaper one",
+        "Manage the installation through licensed, insured contractors",
+        "File the paperwork with the City"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-e",
+      "letter": "E",
+      "title": "LED option",
+      "mapLabel": "LED option",
+      "body": [
+        "Upgrade the lighting until at least 97% of fixtures are LED.",
+        "We use new fixtures or retrofit kits, not plug-in tubes in old ballasts."
+      ],
+      "handle": [
+        "Count every fixture and plan the upgrade",
+        "Install new fixtures or retrofit kits through licensed, insured contractors",
+        "Verify the result and file it with the City"
+      ],
+      "showExtensionLink": true
+    },
+    {
+      "id": "result-site-walk",
+      "title": "That's what the site walk is for.",
+      "mapLabel": "That's what the site walk is for",
+      "body": [
+        "You don't need to know the answer. We walk the building, count the fixtures, and look at the heating and kitchen equipment.",
+        "Then we tell you which path fits and what it takes."
+      ],
+      "handle": [
+        "Walk the building and document what's there",
+        "Check it against the City's requirements",
+        "Recommend the path that fits"
+      ],
+      "showExtensionLink": true
+    }
+  ]
+}

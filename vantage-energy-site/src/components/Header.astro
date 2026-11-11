@@ -1,0 +1,33 @@
+---
+import { site } from '../data/site.js';
+const links = [
+  { href: '/find-your-path/', label: 'Find your path' },
+  { href: '/about/', label: 'About' },
+  { href: '/contact/', label: 'Contact' },
+];
+const here = Astro.url.pathname.replace(/\/?$/, '/');
+---
+<header class="border-b-2 border-ink">
+  <div class="wrap flex items-center justify-between gap-4 py-3 md:py-4">
+    <a href="/" class="ui whitespace-nowrap text-[1.3125rem] font-extrabold leading-none no-underline" style="font-stretch: 122%; letter-spacing: -0.01em;">
+      {site.name}
+    </a>
+
+    <nav aria-label="Main" class="ui hidden items-center gap-7 text-base font-semibold lg:flex">
+      {links.map((l) => (
+        <a href={l.href} aria-current={here === l.href ? 'page' : undefined} class:list={['no-underline hover:underline', here === l.href && 'underline']}>{l.label}</a>
+      ))}
+      <a href="/contact/" class="btn btn-compact">{site.cta}</a>
+    </nav>
+
+    <details class="relative lg:hidden">
+      <summary class="ui flex min-h-11 list-none items-center rounded border-2 border-ink px-3 text-base font-bold [&::-webkit-details-marker]:hidden">Menu</summary>
+      <nav aria-label="Main" class="ui absolute right-0 top-full z-20 mt-2 grid w-[min(20rem,calc(100vw-2rem))] gap-1 border-2 border-ink bg-paper p-3 text-lg font-semibold">
+        {links.map((l) => (
+          <a href={l.href} aria-current={here === l.href ? 'page' : undefined} class="flex min-h-12 items-center px-2 no-underline hover:underline">{l.label}</a>
+        ))}
+        <a href="/contact/" class="btn mt-2">{site.cta}</a>
+      </nav>
+    </details>
+  </div>
+</header>

@@ -1,0 +1,264 @@
+---
+import Base from '../layouts/Base.astro';
+import Photo from '../components/Photo.astro';
+import BookingForm from '../components/BookingForm.astro';
+import Ph from '../components/Ph.astro';
+import path from '../data/find-your-path.json';
+import { site, deadlines } from '../data/site.js';
+
+const firstQuestion = path.questions.find((q) => q.id === path.start);
+
+const steps = [
+  { title: 'Site walk', text: 'We walk the building, count the light fixtures, and look at the heating and kitchen equipment.' },
+  { title: 'Plan and price', text: 'You get one plan in plain English: the compliance path that fits your building, the work involved, and one price.' },
+  { title: 'We manage the work', text: 'Licensed, insured contractors do the work. We schedule them, keep it moving, and keep you posted.' },
+  { title: "We file it. You're compliant.", text: 'We put together the verification and file it with the City. You get a copy for your records.' },
+];
+
+const services = [
+  { photo: 'led', title: 'LED lighting retrofits', text: 'We replace old lighting with new LED fixtures or retrofit kits, inside and out. No plug-in tubes in old ballasts.' },
+  { photo: 'heat-pump', title: 'Heat pump electrification', text: 'We replace a gas furnace or rooftop unit with an electric heat pump. For some buildings, one replacement is the way to comply.' },
+  { photo: 'kitchen', title: 'Kitchen electrification', text: 'For restaurants, we replace a gas fryer, griddle, oven, steam cooker, or kitchen water heater with an electric one.' },
+  { photo: 'filings', title: 'Compliance filings', text: "We complete the City's verification and file it for you. If your building already complies, this may be all you need." },
+];
+
+const yourself = [
+  "Read the City's rules and work out which path fits",
+  'Find a lighting contractor, an HVAC contractor, or both',
+  "Compare bids that don't cover the same work",
+  'Line up schedules, building access, and tenants',
+  'Keep track of permits and inspections',
+  'Collect the verification documents and file with the City',
+];
+const withVantage = ['Walk the building with us', 'Approve one plan and one price', 'Sign one agreement'];
+---
+<Base description="Vantage Energy handles Energize Denver compliance for small commercial and multifamily buildings in Denver. One contract. We handle the rest.">
+
+  <!-- Hero -->
+  <section class="wrap pb-14 pt-10 md:pb-20 md:pt-16">
+    <div class="cols items-center gap-y-10">
+      <div class="col-span-full lg:col-span-7">
+        <h1>Energize Denver compliance for small buildings.</h1>
+        <p class="ui mt-5 text-[1.5rem] font-bold leading-tight md:text-[1.875rem]" style="font-stretch: 112%;">One contract. We handle the rest.</p>
+        <p class="lede measure mt-6">
+          If your Denver building is between 5,000 and 24,999 sq ft, the City has an energy rule it has to meet.
+          Vantage plans the work, manages the contractors who do it, and files the paperwork.
+        </p>
+        <div class="mt-8 flex flex-col gap-5 md:flex-row md:items-center md:gap-7">
+          <a href="/contact/" class="btn">{site.cta}</a>
+          <a href="/find-your-path/" class="ui font-semibold">See what your building needs</a>
+        </div>
+        <p class="small mt-7 text-soft">Work performed by licensed, insured contractors.</p>
+      </div>
+      <div class="col-span-full lg:col-span-5">
+        <Photo name="hero" ratio="var(--hero-ratio)" class="[--hero-ratio:3/2] lg:[--hero-ratio:4/5]" sizes="(min-width: 64rem) 40vw, 100vw" eager />
+      </div>
+    </div>
+  </section>
+
+  <!-- Does it apply to you? -->
+  <section class="section border-t-2 border-ink">
+    <div class="wrap cols gap-y-12">
+      <div class="col-span-full lg:col-span-6">
+        <h2>Does Energize Denver apply to you?</h2>
+        <p class="measure mt-5">It does if all three of these are true.</p>
+        <ul class="measure mt-5 grid gap-4">
+          {[
+            'The building is in the City and County of Denver.',
+            "It's a commercial or multifamily building.",
+            "It's 5,000 sq ft or larger.",
+          ].map((item) => (
+            <li class="ui relative pl-10 text-[1.1875rem] font-semibold leading-snug">
+              <svg class="absolute left-0 top-0.5 h-6 w-6" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="3" fill="#ffc42e" stroke="#1f2e38" stroke-width="2"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#1f2e38" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              {item}
+            </li>
+          ))}
+        </ul>
+        <p class="measure mt-7">
+          This site is about small buildings, 5,000 to 24,999 sq ft. They pick one way to comply.
+          For most, that's LED lighting. Some are better off replacing a gas heating unit with a heat pump,
+          and restaurants and condo buildings have their own options.
+        </p>
+        <p class="measure mt-4">Buildings of 25,000 sq ft and larger follow different rules.</p>
+      </div>
+
+      <div class="col-span-full lg:col-span-5 lg:col-start-8">
+        <table class="w-full border-collapse text-left text-[1rem] md:text-[1.125rem]">
+          <caption class="ui mb-3 text-left text-[1.3125rem] font-bold" style="font-stretch: 112%;">When it's due</caption>
+          <thead>
+            <tr class="ui border-b-2 border-ink text-base">
+              <th scope="col" class="py-2 pr-4 font-semibold">Building size</th>
+              <th scope="col" class="py-2 font-semibold">Deadline</th>
+            </tr>
+          </thead>
+          <tbody>
+            {deadlines.rows.map((row) => (
+              <tr class="border-b border-rule">
+                <th scope="row" class="whitespace-nowrap py-3 pr-3 font-normal">{row.size}</th>
+                <td class="ui whitespace-nowrap py-3 font-bold">{row.due}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        <p class="small mt-4 text-soft">
+          Deadlines as published by the City, checked {deadlines.checked}.{' '}
+          <a href={site.citySmallBuildingsUrl} rel="noopener">Look up your building on energizedenver.org</a>
+        </p>
+        <p class="small ui mt-5 font-semibold">
+          Not sure where your building falls? <a href="/contact/">{site.cta}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Find Your Path teaser: question 1 is live -->
+  <section class="section bg-wash">
+    <div class="wrap cols">
+      <div class="col-span-full lg:col-span-9">
+        <h2>Answer up to {path.questions.length} questions, see what your building needs.</h2>
+        <p class="measure mt-5">Start here. Each answer takes you to the next question or to a result.</p>
+        <div class="mt-8 border-2 border-ink bg-paper p-5 md:p-8">
+          <p class="ui text-base font-semibold">Question 1 of {path.questions.length}</p>
+          <h3 class="mt-2 text-[1.5rem] md:text-[1.875rem]" style="line-height: 1.12;">{firstQuestion.text}</h3>
+          <ul class="mt-6 grid gap-3 md:grid-cols-2">
+            {firstQuestion.answers.map((a) => (
+              <li><a class="answer" href={`/find-your-path/#${a.goto}`}>{a.label}</a></li>
+            ))}
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="section">
+    <div class="wrap">
+      <h2>How it works</h2>
+      <ol class="route mt-10">
+        {steps.map((s) => (
+          <li>
+            <h3>{s.title}</h3>
+            <p class="mt-2 max-w-[38ch]">{s.text}</p>
+          </li>
+        ))}
+      </ol>
+      <p class="mt-12"><a href="/contact/" class="btn w-full md:w-auto">{site.cta}</a></p>
+    </div>
+  </section>
+
+  <!-- Services -->
+  <section class="section border-t-2 border-ink">
+    <div class="wrap">
+      <h2>What we do</h2>
+      <div class="mt-10 grid gap-x-8 gap-y-12 md:grid-cols-2">
+        {services.map((s) => (
+          <article>
+            <Photo name={s.photo} ratio="3 / 2" sizes="(min-width: 48rem) 45vw, 100vw" />
+            <h3 class="mt-5">{s.title}</h3>
+            <p class="mt-2 max-w-[52ch]">{s.text}</p>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- Incentives: this sentence is the only promise we make about incentives. -->
+  <section class="section bg-wash">
+    <div class="wrap cols">
+      <div class="col-span-full lg:col-span-9">
+        <h2>Incentives</h2>
+        <p class="mt-5 max-w-[34ch] text-[1.5rem] leading-snug md:text-[1.875rem]">
+          We find the incentives currently available to your building and structure the project to make the most of them.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- One contract -->
+  <section class="section">
+    <div class="wrap">
+      <h2 class="max-w-[20ch]">Why one contract beats juggling contractors</h2>
+      <div class="cols mt-10 gap-y-10">
+        <div class="col-span-full md:col-span-4 lg:col-span-6">
+          <h3>If you run the project yourself</h3>
+          <ul class="mt-4 grid gap-3">
+            {yourself.map((item) => (
+              <li class="relative max-w-[44ch] pl-7 before:absolute before:left-0 before:top-[0.75em] before:h-0.5 before:w-4 before:bg-ink">{item}</li>
+            ))}
+          </ul>
+        </div>
+        <div class="col-span-full md:col-span-4 lg:col-span-5 lg:col-start-8">
+          <div class="border-2 border-ink p-5 md:p-7">
+            <h3>With Vantage</h3>
+            <ul class="mt-4 grid gap-3">
+              {withVantage.map((item) => (
+                <li class="relative pl-7 before:absolute before:left-0 before:top-[0.55em] before:h-2.5 before:w-4 before:border-y-2 before:border-ink before:bg-tag">{item}</li>
+              ))}
+            </ul>
+            <p class="mt-5">We handle everything in the other list.</p>
+            <p class="mt-6"><a href="/contact/" class="btn w-full">{site.cta}</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="section border-t-2 border-ink">
+    <div class="wrap cols gap-y-8">
+      <h2 class="col-span-full lg:col-span-4">Common questions</h2>
+      <div class="faq col-span-full lg:col-span-8">
+        <details>
+          <summary>What is Energize Denver?</summary>
+          <div class="answer-text">It's the City and County of Denver's energy policy for existing buildings. It covers commercial and multifamily buildings of 5,000 sq ft and larger. Buildings between 5,000 and 24,999 sq ft have to take steps to reduce energy use, most often by upgrading to LED lighting.</div>
+        </details>
+        <details>
+          <summary>How do I find my building's square footage and deadline?</summary>
+          <div class="answer-text">The City lists covered small buildings in its Small Building Look Up Tool at <a href={site.citySmallBuildingsUrl} rel="noopener">energizedenver.org</a>. If you'd rather not dig, <a href="/contact/">book a free compliance check</a> and we'll look it up.</div>
+        </details>
+        <details>
+          <summary>What does the free compliance check include?</summary>
+          <div class="answer-text"><Ph text="what the free compliance check includes and how long it takes" /></div>
+        </details>
+        <details>
+          <summary>Who does the work?</summary>
+          <div class="answer-text">You sign one agreement with Vantage, and we plan and manage the project from start to finish. Work performed by licensed, insured contractors.</div>
+        </details>
+        <details>
+          <summary>My lights are already LED. Do I still need to do anything?</summary>
+          <div class="answer-text">Possibly just the paperwork. If at least 97% of your fixtures are LED, you may already comply, but the City still needs to see it documented. We verify it and file it.</div>
+        </details>
+        <details>
+          <summary>What will it cost?</summary>
+          <div class="answer-text">It depends on the building, so we price it after the site walk. You get one price for the whole job. <Ph text="payment terms, if you want them stated here" /></div>
+        </details>
+        <details>
+          <summary>What if I can't get it done by my deadline?</summary>
+          <div class="answer-text">The City offers extensions for situations like a pending sale, high vacancy, or budget approval cycles. The City decides whether to grant one. We can help you work out whether to ask.</div>
+        </details>
+        <details>
+          <summary>Do you work with buildings of 25,000 sq ft and larger?</summary>
+          <div class="answer-text">Larger buildings follow different rules. <a href="/contact/">Let's talk.</a></div>
+        </details>
+        <details>
+          <summary>Is Vantage part of the City?</summary>
+          <div class="answer-text">No. Vantage Energy is a private company. The City makes the final call on whether a building complies.</div>
+        </details>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final call to action -->
+  <section class="band section" id="book">
+    <div class="wrap cols gap-y-10">
+      <div class="col-span-full lg:col-span-5">
+        <h2>{site.cta}</h2>
+        <p class="lede mt-5 max-w-[36ch]">Tell us about the building. We look it up in the City's records and get back to you.</p>
+        <p class="small mt-6 max-w-[40ch]">Rather start with a few questions? <a href="/find-your-path/">Find your path</a></p>
+      </div>
+      <div class="col-span-full lg:col-span-6 lg:col-start-7">
+        <BookingForm id="home" source="home" />
+      </div>
+    </div>
+  </section>
+</Base>

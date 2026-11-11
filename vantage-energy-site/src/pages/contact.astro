@@ -1,0 +1,40 @@
+---
+import Base from '../layouts/Base.astro';
+import BookingForm from '../components/BookingForm.astro';
+import Ph from '../components/Ph.astro';
+import { site } from '../data/site.js';
+---
+<Base
+  title="Book a free compliance check"
+  description="Tell us about your Denver building. We look it up in the City's records and tell you where it stands with Energize Denver."
+>
+  <section class="wrap pb-14 pt-10 md:pb-20 md:pt-16">
+    <div class="cols gap-y-12">
+      <div class="col-span-full lg:col-span-7">
+        <h1 class="max-w-[14ch]">{site.cta}</h1>
+        <p class="lede measure mb-8 mt-6">Tell us about the building. We look it up in the City's records and get back to you.</p>
+        <BookingForm id="contact" source="contact" />
+      </div>
+
+      <aside class="col-span-full lg:col-span-4 lg:col-start-9 lg:pt-4">
+        <h2 class="text-[1.5rem]">Reach us directly</h2>
+        <dl class="mt-5 grid gap-4">
+          <div>
+            <dt class="ui text-base font-semibold">Phone</dt>
+            <dd><Ph text={site.phone} /></dd>
+          </div>
+          <div>
+            <dt class="ui text-base font-semibold">Email</dt>
+            <dd><Ph text={site.email} /></dd>
+          </div>
+          <div>
+            <dt class="ui text-base font-semibold">Hours</dt>
+            <dd><Ph text="business hours" /></dd>
+          </div>
+        </dl>
+        <h2 class="mt-10 text-[1.5rem]">Not ready to book?</h2>
+        <p class="mt-4 max-w-[36ch]">Answer a few yes-or-no questions and see what your building needs. <a href="/find-your-path/">Find your path</a></p>
+      </aside>
+    </div>
+  </section>
+</Base>

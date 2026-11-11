@@ -1,0 +1,6 @@
+---
+// Marks a spot where real content is still needed. Search the project for "PLACEHOLDER" to find them all.
+const { text } = Astro.props;
+const label = String(text).startsWith('[PLACEHOLDER') ? text : `[PLACEHOLDER: ${text}]`;
+---
+<mark class="ph">{label}</mark>

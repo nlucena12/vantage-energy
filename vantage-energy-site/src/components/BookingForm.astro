@@ -1,0 +1,48 @@
+---
+// The one conversion on the site. Submissions go to Netlify Forms under "compliance-check".
+import { site } from '../data/site.js';
+const { id = 'book', source = '', stacked = false } = Astro.props;
+---
+<form
+  name="compliance-check"
+  method="POST"
+  action="/thanks/"
+  data-netlify="true"
+  netlify-honeypot="company-site"
+  class="grid gap-5"
+  id={`${id}-form`}
+>
+  <input type="hidden" name="form-name" value="compliance-check" />
+  <input type="hidden" name="source-page" value={source} />
+  <input type="hidden" name="path-result" value="" data-path-result />
+  <p class="hidden">
+    <label>Leave this empty <input name="company-site" tabindex="-1" autocomplete="off" /></label>
+  </p>
+
+  <div class="field">
+    <label for={`${id}-name`}>Your name</label>
+    <input id={`${id}-name`} name="name" type="text" autocomplete="name" required />
+  </div>
+  <div class:list={['grid gap-5', !stacked && 'md:grid-cols-2']}>
+    <div class="field">
+      <label for={`${id}-email`}>Email</label>
+      <input id={`${id}-email`} name="email" type="email" autocomplete="email" required />
+    </div>
+    <div class="field">
+      <label for={`${id}-phone`}>Phone (optional)</label>
+      <input id={`${id}-phone`} name="phone" type="tel" autocomplete="tel" />
+    </div>
+  </div>
+  <div class="field">
+    <label for={`${id}-address`}>Building address</label>
+    <span class="hint" id={`${id}-address-hint`}>We use it to look up your building in the City's records.</span>
+    <input id={`${id}-address`} name="building-address" type="text" autocomplete="street-address" aria-describedby={`${id}-address-hint`} required />
+  </div>
+  <div class="field">
+    <label for={`${id}-notes`}>Anything we should know? (optional)</label>
+    <textarea id={`${id}-notes`} name="notes" rows="3"></textarea>
+  </div>
+  <div>
+    <button type="submit" class:list={['btn w-full', !stacked && 'md:w-auto']}>{site.cta}</button>
+  </div>
+</form>

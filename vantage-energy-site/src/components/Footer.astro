@@ -1,0 +1,27 @@
+---
+import Ph from './Ph.astro';
+import { site } from '../data/site.js';
+---
+<footer class="border-t-2 border-ink">
+  <div class="wrap cols gap-y-8 py-12 small">
+    <div class="col-span-4 md:col-span-4 lg:col-span-5">
+      <p class="ui text-xl font-extrabold" style="font-stretch: 122%;">{site.name}</p>
+      <p class="mt-3 max-w-[40ch]">Energize Denver compliance for small commercial and multifamily buildings in Denver.</p>
+      <p class="mt-3 max-w-[40ch]">Work performed by licensed, insured contractors.</p>
+    </div>
+    <nav aria-label="Footer" class="ui col-span-2 grid content-start gap-2 font-semibold md:col-span-2 lg:col-span-3">
+      <a href="/find-your-path/">Find your path</a>
+      <a href="/about/">About</a>
+      <a href="/contact/">Contact</a>
+      <a href={site.cityUrl} rel="noopener">Energize Denver (City site)</a>
+    </nav>
+    <div class="col-span-4 grid content-start gap-2 md:col-span-2 lg:col-span-4">
+      <p><Ph text={site.phone} /></p>
+      <p><Ph text={site.email} /></p>
+      <p>Denver, Colorado</p>
+    </div>
+    <p class="col-span-full border-t border-rule pt-6 text-soft">
+      &copy; {new Date().getFullYear()} <Ph text={site.legalName} />. Vantage Energy is a private company and is not part of the City and County of Denver.
+    </p>
+  </div>
+</footer>

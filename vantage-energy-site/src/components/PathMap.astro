@@ -1,0 +1,189 @@
+---
+// Draws the whole decision tree as an SVG, straight from src/data/find-your-path.json.
+// Two layouts come from the same data: "wide" for desktops, "compact" for phones and tablets.
+import data from '../data/find-your-path.json';
+
+const { variant = 'wide', class: cls = '' } = Astro.props;
+
+const qById = Object.fromEntries(data.questions.map((q) => [q.id, q]));
+const rById = Object.fromEntries(data.results.map((r) => [r.id, r]));
+const text = (n) => n.mapLabel || n.title || n.text;
+
+// The spine: follow the answer that leads to another question.
+const order = [];
+let cur = qById[data.start];
+while (cur && !order.includes(cur)) {
+  order.push(cur);
+  const onward = cur.answers.find((a) => qById[a.goto]);
+  cur = onward ? qById[onward.goto] : null;
+}
+
+// A result reached from more than one question is drawn once and shared.
+const refs = {};
+order.forEach((q, i) => q.answers.forEach((a) => {
+  if (rById[a.goto]) (refs[a.goto] ||= []).push({ q, n: i + 1, a });
+}));
+const shared = Object.keys(refs).filter((id) => refs[id].length > 1);
+
+function wrap(str, max) {
+  const lines = [];
+  let line = '';
+  for (const word of str.split(' ')) {
+    if (line && (line + ' ' + word).length > max) { lines.push(line); line = word; }
+    else line = line ? line + ' ' + word : word;
+  }
+  if (line) lines.push(line);
+  return lines;
+}
+const listNums = (nums) => nums.length < 2 ? `${nums[0]}` : `${nums.slice(0, -1).join(', ')} or ${nums.at(-1)}`;
+
+const nodes = [];
+const edges = [];
+const labels = [];
+let W, H;
+
+if (variant === 'wide') {
+  const RAIL = 30, QX = 126, QW = 318, BUS = QX + QW + 22, RX = 590, RW = 300, SPX = QX + 44, GAP = 54;
+  W = RX + RW + 6;
+  let y = 16;
+  const pos = {};
+  order.forEach((q) => {
+    const qLines = wrap(text(q), 32);
+    const qH = Math.max(58, 30 + qLines.length * 20);
+    const exits = q.answers.filter((a) => rById[a.goto] && !shared.includes(a.goto)).map((a) => {
+      const lines = wrap(text(rById[a.goto]), 30);
+      return { a, lines, h: Math.max(46, 26 + lines.length * 19) };
+    });
+    const exitsH = exits.reduce((sum, e) => sum + e.h, 0) + Math.max(0, exits.length - 1) * 12;
+    const blockH = Math.max(qH, exitsH);
+    const qY = y + (blockH - qH) / 2;
+    const qMid = qY + qH / 2;
+    pos[q.id] = { top: qY, bottom: qY + qH, mid: qMid };
+    nodes.push({ id: q.id, kind: 'q', x: QX, y: qY, w: QW, h: qH, lines: qLines, lh: 20 });
+
+    let ry = y + (blockH - exitsH) / 2;
+    exits.forEach((e) => {
+      const mid = ry + e.h / 2;
+      edges.push({ id: `${q.id}>${e.a.goto}`, d: `M${QX + QW} ${qMid} H${BUS} V${mid} H${RX - 2}`, hi: `M${QX + QW} ${qMid} H${BUS} V${mid} H${RX - 9}`, arrow: `${RX - 1},${mid} ${RX - 10},${mid - 5} ${RX - 10},${mid + 5}` });
+      labels.push({ x: BUS + 10, y: mid - 8, t: e.a.mapLabel || e.a.label });
+      nodes.push({ id: e.a.goto, kind: 'r', x: RX, y: ry, w: RW, h: e.h, lines: e.lines, lh: 19 });
+      ry += e.h + 12;
+    });
+    y += blockH + GAP;
+  });
+  order.forEach((q, i) => {
+    const next = order[i + 1];
+    if (!next) return;
+    const a = q.answers.find((x) => x.goto === next.id);
+    const y1 = pos[q.id].bottom, y2 = pos[next.id].top;
+    edges.push({ id: `${q.id}>${next.id}`, d: `M${SPX} ${y1} V${y2 - 2}`, hi: `M${SPX} ${y1} V${y2 - 9}`, arrow: `${SPX},${y2 - 1} ${SPX - 5},${y2 - 10} ${SPX + 5},${y2 - 10}` });
+    labels.push({ x: SPX + 14, y: (y1 + y2) / 2 + 3, t: a.mapLabel || a.label });
+  });
+  y -= GAP - 30;
+  shared.forEach((id) => {
+    const lines = wrap(text(rById[id]), 34);
+    const h = Math.max(52, 28 + lines.length * 19);
+    const mid = y + h / 2;
+    refs[id].forEach(({ q, a }) => {
+      const m = pos[q.id].mid;
+      edges.push({ id: `${q.id}>${id}`, dashed: true, d: `M${QX} ${m} H${RAIL} V${mid} H${QX - 2}`, hi: `M${QX} ${m} H${RAIL} V${mid} H${QX - 9}`, arrow: `${QX - 1},${mid} ${QX - 10},${mid - 5} ${QX - 10},${mid + 5}` });
+      labels.push({ x: RAIL + 12, y: m - 8, t: a.mapLabel || a.label });
+    });
+    nodes.push({ id, kind: 'r', shared: true, x: QX, y, w: QW, h, lines, lh: 19 });
+    y += h + 16;
+  });
+  H = y + 4;
+} else {
+  const SP = 18, QX = 42, QW = 312, LX = 46, RX = 152, RW = 202;
+  W = QX + QW + 6;
+  let y = 12;
+  const station = {};
+  const branches = [];
+  const lastBranch = {};
+  order.forEach((q, i) => {
+    const qLines = wrap(text(q), 36);
+    const qH = Math.max(50, 28 + qLines.length * 19);
+    station[q.id] = y + qH / 2;
+    nodes.push({ id: q.id, kind: 'q', x: QX, y, w: QW, h: qH, lines: qLines, lh: 19, station: { x: SP, y: y + qH / 2 } });
+    y += qH + 10;
+    q.answers.filter((a) => rById[a.goto] && !shared.includes(a.goto)).forEach((a) => {
+      const lines = wrap(text(rById[a.goto]), 22);
+      const h = Math.max(44, 24 + lines.length * 18);
+      const mid = y + h / 2;
+      branches.push({ id: `${q.id}>${a.goto}`, d: `M${SP} ${mid} H${LX - 8}`, hi: `M${SP} ${station[q.id]} V${mid} H${LX - 8}` });
+      lastBranch[q.id] = mid;
+      labels.push({ x: LX, y: mid + 4.5, t: a.mapLabel || a.label });
+      nodes.push({ id: a.goto, kind: 'r', x: RX, y, w: RW, h, lines, lh: 18 });
+      y += h + 8;
+    });
+    const next = order[i + 1];
+    if (next) {
+      const a = q.answers.find((x) => x.goto === next.id);
+      labels.push({ x: SP + 14, y: y + 16, t: a.mapLabel || a.label });
+      y += 34;
+    }
+  });
+  order.forEach((q, i) => {
+    const next = order[i + 1];
+    if (next) edges.push({ id: `${q.id}>${next.id}`, d: `M${SP} ${station[q.id]} V${station[next.id]}` });
+    else if (lastBranch[q.id]) edges.push({ id: `${q.id}>end`, d: `M${SP} ${station[q.id]} V${lastBranch[q.id]}` });
+  });
+  edges.push(...branches);
+  y += 10;
+  shared.forEach((id) => {
+    const first = refs[id][0].a;
+    const caption = wrap(`${first.mapLabel || first.label} on question ${listNums(refs[id].map((r) => r.n))}:`, 38);
+    const lines = wrap(text(rById[id]), 36);
+    const h = 26 + (caption.length + lines.length) * 19;
+    nodes.push({ id, kind: 'r', shared: true, x: QX, y, w: QW, h, lines, lh: 19, caption });
+    y += h + 12;
+  });
+  H = y + 2;
+}
+
+const uid = `map-${variant}`;
+---
+<svg
+  class:list={['map', cls]}
+  viewBox={`0 0 ${W} ${H}`}
+  width={W}
+  height={H}
+  role="img"
+  aria-labelledby={`${uid}-title ${uid}-desc`}
+  style={`width: 100%; max-width: ${variant === 'wide' ? W + 'px' : '30rem'}; height: auto;`}
+  data-map
+>
+  <title id={`${uid}-title`}>Map of the Find Your Path questions</title>
+  <desc id={`${uid}-desc`}>
+    A flowchart of {order.length} questions and the result each answer leads to. The same questions and results are listed in full on this page.
+  </desc>
+
+  {edges.map((e) => <path class:list={['edge', e.dashed && 'dashed']} d={e.d} />)}
+  {edges.map((e) => (
+    <g data-edge={e.id}>
+      <path class="edge-case" d={e.hi || e.d} />
+      <path class="edge-hi" d={e.hi || e.d} />
+    </g>
+  ))}
+  {edges.filter((e) => e.arrow).map((e) => <polygon points={e.arrow} fill="#1f2e38" />)}
+
+  {labels.map((l) => (
+    <text class="a-text" x={l.x} y={l.y} paint-order="stroke" stroke="#f4f6f4" stroke-width="5" stroke-linejoin="round">{l.t}</text>
+  ))}
+
+  {nodes.map((n) => {
+    const all = [...(n.caption || []), ...n.lines];
+    const firstY = n.y + n.h / 2 - ((all.length - 1) * n.lh) / 2 + 5;
+    return (
+      <g data-node={n.id}>
+        <rect class:list={[n.kind === 'q' ? 'q-box' : 'r-box', n.shared && 'shared']} x={n.x} y={n.y} width={n.w} height={n.h} rx={n.kind === 'q' ? 6 : 3} />
+        {n.station && <circle class="station" cx={n.station.x} cy={n.station.y} r="7" />}
+        <text class={n.kind === 'q' ? 'q-text' : 'r-text'} x={n.x + 14} y={firstY}>
+          {all.map((line, i) => (
+            <tspan x={n.x + 14} dy={i === 0 ? 0 : n.lh} font-weight={n.caption && i >= n.caption.length ? 700 : undefined}>{line}</tspan>
+          ))}
+        </text>
+      </g>
+    );
+  })}
+</svg>
