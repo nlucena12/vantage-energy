@@ -192,7 +192,7 @@
   /* The card that hangs off the bottom edge of the hero. */
   .hang { margin-bottom: -5rem; position: relative; z-index: 2; }
   .after-hang { padding-top: 8.5rem; }
-  @media (min-width: 64rem) { .after-hang { padding-top: 9.5rem; } }
+  @media (min-width: 64rem) { .hang { margin-bottom: 0; } .after-hang { padding-top: 4.5rem; } }
 
   /* ---------- Quiz answers ---------- */
   .answer {
