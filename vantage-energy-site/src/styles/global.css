@@ -189,10 +189,10 @@
   .hero h1 { font-size: clamp(2.125rem, 1.2rem + 4.2vw, 4.125rem); }
   .hero-note { display: inline-flex; align-items: center; gap: 0.6rem; padding: 0.45rem 0.9rem 0.45rem 0.7rem; border: 1.5px solid rgb(244 246 244 / 0.28); border-radius: 999px; font-size: 0.9375rem; font-weight: 600; line-height: 1.25; background: rgb(21 33 42 / 0.5); }
   .hero-note i { width: 0.6rem; height: 0.6rem; border-radius: 50%; background: var(--color-tag); flex: none; }
-  /* The card that hangs off the bottom edge of the hero. */
-  .hang { margin-bottom: -5rem; position: relative; z-index: 2; }
-  .after-hang { padding-top: 8.5rem; }
-  @media (min-width: 64rem) { .hang { margin-bottom: 0; } .after-hang { padding-top: 4.5rem; } }
+  /* The survey card sits fully inside the hero at every size. */
+  .hang { position: relative; z-index: 2; }
+  .after-hang { padding-top: 3.5rem; }
+  @media (min-width: 64rem) { .after-hang { padding-top: 4.5rem; } }
 
   /* ---------- Quiz answers ---------- */
   .answer {
