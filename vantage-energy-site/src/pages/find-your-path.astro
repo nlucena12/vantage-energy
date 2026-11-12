@@ -19,73 +19,71 @@ const [noteBefore, noteAfter] = meta.footnote.split('{date}');
   title="Find your path"
   description="Answer a few yes-or-no questions to see how your Denver building can comply with Energize Denver."
 >
-  <section class="wrap pb-14 pt-8 md:pb-20 md:pt-12">
-    <div class="cols">
-      <div class="col-span-full lg:col-span-7">
-        <h1 class="ui mb-6 text-lg font-bold leading-tight md:mb-8" style="letter-spacing: 0; font-stretch: 104%;">Find your path</h1>
+  <div class="dark plan-grid">
+    <div class="wrap pb-28 pt-8 md:pb-32 md:pt-12">
+      <h1 class="text-[1.75rem] md:text-[2.25rem]">Find your path</h1>
+      <p class="mt-2 max-w-[48ch]">Answer up to {total} questions. See how your building can comply and what we would handle.</p>
+    </div>
+  </div>
 
-        <div data-flow>
-          {questions.map((q, i) => (
-            <section id={q.id} data-step data-kind="question" aria-labelledby={`${q.id}-h`}>
-              <div class="ui mb-5 flex min-h-11 flex-wrap items-center gap-x-6 gap-y-2 text-base font-semibold">
-                {parentOf[q.id] && <a href={`#${parentOf[q.id]}`} data-back>Back</a>}
-                <span>Question {i + 1} of {total}</span>
-                <ol class="progress" aria-hidden="true">
-                  {questions.map((_, k) => (
-                    <li class:list={[k < i && 'is-done', k === i && 'is-now']}>
-                      <span class="dot"></span>
-                      {k < total - 1 && <span class="seg"></span>}
-                    </li>
-                  ))}
-                </ol>
-              </div>
-              <h2 id={`${q.id}-h`} tabindex="-1" class="max-w-[22ch]">{q.text}</h2>
-              {q.hint && <p class="measure mt-4">{q.hint}</p>}
-              <ul class:list={['mt-8 grid gap-3', q.answers.length === 3 ? 'md:grid-cols-3' : 'md:grid-cols-2']}>
-                {q.answers.map((a) => (
-                  <li><a class="answer" href={`#${a.goto}`}>{a.label}</a></li>
-                ))}
-              </ul>
-            </section>
-          ))}
+  <section class="wrap -mt-20 pb-16 md:-mt-24 md:pb-24">
+    <div class="cols items-start gap-y-8">
+      <div class="card card-lift col-span-full p-5 md:p-9 lg:col-span-7" data-flow>
+        {questions.map((q, i) => (
+          <section id={q.id} data-step data-kind="question" aria-labelledby={`${q.id}-h`}>
+            <ol class="progress" aria-hidden="true">
+              {questions.map((_, k) => <li class:list={[k < i && 'is-done', k === i && 'is-now']}></li>)}
+            </ol>
+            <div class="mt-3 flex min-h-11 items-center justify-between gap-4 text-[0.9688rem]">
+              <span class="font-semibold text-soft">Question {i + 1} of {total}</span>
+              {parentOf[q.id] && <a href={`#${parentOf[q.id]}`} class="back-link" data-back>Back</a>}
+            </div>
+            <h2 id={`${q.id}-h`} tabindex="-1" class="mt-3 max-w-[20ch] text-[1.875rem] md:text-[2.5rem]">{q.text}</h2>
+            {q.hint && <p class="measure mt-4 text-soft">{q.hint}</p>}
+            <ul class="mt-7 grid gap-2.5">
+              {q.answers.map((a) => (
+                <li><a class="answer" href={`#${a.goto}`}>{a.label}</a></li>
+              ))}
+            </ul>
+          </section>
+        ))}
 
-          {results.map((r) => (
-            <section id={r.id} data-step data-kind="result" aria-labelledby={`${r.id}-h`}>
-              <div class="ui mb-5 flex min-h-11 flex-wrap items-center gap-x-6 gap-y-2 text-base font-semibold">
-                <a href={`#${parentOf[r.id] ?? data.start}`} data-back>Back</a>
-                <span>Your result</span>
-              </div>
-              <h2 id={`${r.id}-h`} tabindex="-1" class="max-w-[20ch]">{r.title}</h2>
-              <div class="measure mt-5 grid gap-3">
-                {r.body.map((p) => <p>{p}</p>)}
-              </div>
-              <h3 class="mt-8">What we handle for you</h3>
-              <ul class="measure mt-3 grid gap-2">
-                {r.handle.map((item) => (
-                  <li class="relative pl-7 before:absolute before:left-0 before:top-[0.55em] before:h-2.5 before:w-4 before:border-y-2 before:border-ink before:bg-tag">{item}</li>
-                ))}
+        {results.map((r) => (
+          <section id={r.id} data-step data-kind="result" aria-labelledby={`${r.id}-h`}>
+            <div class="flex min-h-11 items-center justify-between gap-4 text-[0.9688rem]">
+              <span class="chip">Your result</span>
+              <a href={`#${parentOf[r.id] ?? data.start}`} class="back-link" data-back>Back</a>
+            </div>
+            <h2 id={`${r.id}-h`} tabindex="-1" class="mt-4 max-w-[18ch] text-[1.875rem] md:text-[2.5rem]">{r.title}</h2>
+            <div class="measure mt-5 grid gap-3">
+              {r.body.map((p) => <p>{p}</p>)}
+            </div>
+            <div class="mt-7 rounded-2xl bg-wash p-5 md:p-6">
+              <h3>What we handle for you</h3>
+              <ul class="checks mt-4">
+                {r.handle.map((item) => <li>{item}</li>)}
               </ul>
-              <p class="mt-8">
-                <a class="btn w-full md:w-auto" href="#book" data-book>{site.cta}</a>
-              </p>
-              {r.showExtensionLink && (
-                <p class="small measure mt-6"><a href={meta.extensionUrl} rel="noopener">{meta.extensionText}</a></p>
-              )}
-              <p class="small ui mt-4 font-semibold"><a href={`#${data.start}`}>Start over</a></p>
-            </section>
-          ))}
-        </div>
+            </div>
+            <p class="mt-7">
+              <a class="btn w-full md:w-auto" href="#book" data-book>{site.cta}</a>
+            </p>
+            {r.showExtensionLink && (
+              <p class="small measure mt-6 text-soft"><a href={meta.extensionUrl} rel="noopener">{meta.extensionText}</a></p>
+            )}
+            <p class="small mt-4 font-semibold"><a href={`#${data.start}`}>Start over</a></p>
+          </section>
+        ))}
       </div>
 
-      <div class="col-span-full mt-12 border-2 border-ink bg-wash p-5 md:p-8 lg:col-span-5 lg:col-start-8 lg:mt-0 lg:self-start lg:p-7" id="book" data-booking>
-        <h2 class="text-[1.625rem] md:text-[2rem]" tabindex="-1">{site.cta}</h2>
-        <p class="measure mb-6 mt-3">Tell us about the building. We look it up in the City's records and get back to you.</p>
+      <div class="card card-lift col-span-full p-5 md:p-8 lg:col-span-5 lg:p-7" id="book" data-booking>
+        <h2 class="text-[1.5rem] md:text-[1.75rem]" tabindex="-1">{site.cta}</h2>
+        <p class="mb-5 mt-3 text-soft">Tell us about the building. We look it up in the City's records and get back to you.</p>
         <BookingForm id="path" source="find-your-path" stacked />
       </div>
     </div>
 
-    <details class="mt-12">
-      <summary class="ui inline-flex min-h-11 items-center text-lg font-bold underline decoration-2 underline-offset-4">See the whole map</summary>
+    <details class="mt-10">
+      <summary class="map-toggle">See the whole map</summary>
       <div class="mt-6">
         <p class="small mb-5" data-js-only>
           <span class="mr-2 inline-block h-2.5 w-7 border-y-2 border-ink bg-tag align-middle"></span>Yellow marks the path you've taken so far.
@@ -95,7 +93,7 @@ const [noteBefore, noteAfter] = meta.footnote.split('{date}');
       </div>
     </details>
 
-    <p class="small measure mt-12 border-t border-rule pt-6 text-soft">
+    <p class="small measure mt-10 border-t border-rule pt-6 text-soft">
       {noteBefore}<Ph text={meta.guidanceDate} />{noteAfter}{' '}
       <a href={meta.cityUrl} rel="noopener">energizedenver.org</a>
     </p>
@@ -149,7 +147,7 @@ const [noteBefore, noteAfter] = meta.footnote.split('{date}');
     const heading = step.querySelector('h2');
     document.title = heading.textContent.trim() + ' | Find your path | Vantage Energy';
     if (moveFocus) {
-      const top = document.querySelector('[data-flow]').getBoundingClientRect().top + window.scrollY - 96;
+      const top = document.querySelector('[data-flow]').getBoundingClientRect().top + window.scrollY - 84;
       if (window.scrollY > top) window.scrollTo(0, Math.max(0, top));
       heading.focus({ preventScroll: true });
     }

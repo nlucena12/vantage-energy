@@ -2,9 +2,11 @@
 import Base from '../layouts/Base.astro';
 ---
 <Base title="Page not found" description="That page doesn't exist.">
-  <section class="wrap section">
-    <h1 class="max-w-[14ch]">That page doesn't exist.</h1>
-    <p class="lede measure mt-6">The link may be old or mistyped.</p>
-    <p class="ui mt-8 font-semibold"><a href="/">Go to the homepage</a></p>
+  <section class="dark plan-grid">
+    <div class="wrap py-24 md:py-36">
+      <h1 class="max-w-[14ch]">That page doesn't exist.</h1>
+      <p class="lede mt-6 max-w-[44ch]">The link may be old or mistyped.</p>
+      <p class="mt-9"><a href="/" class="btn">Go to the homepage</a></p>
+    </div>
   </section>
 </Base>

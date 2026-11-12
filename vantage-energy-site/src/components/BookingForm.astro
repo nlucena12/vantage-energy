@@ -9,7 +9,8 @@ const { id = 'book', source = '', stacked = false } = Astro.props;
   action="/thanks/"
   data-netlify="true"
   netlify-honeypot="company-site"
-  class="grid gap-5"
+  class="grid gap-4"
+  data-dock-hide
   id={`${id}-form`}
 >
   <input type="hidden" name="form-name" value="compliance-check" />
@@ -23,7 +24,7 @@ const { id = 'book', source = '', stacked = false } = Astro.props;
     <label for={`${id}-name`}>Your name</label>
     <input id={`${id}-name`} name="name" type="text" autocomplete="name" required />
   </div>
-  <div class:list={['grid gap-5', !stacked && 'md:grid-cols-2']}>
+  <div class:list={['grid gap-4', !stacked && 'md:grid-cols-2']}>
     <div class="field">
       <label for={`${id}-email`}>Email</label>
       <input id={`${id}-email`} name="email" type="email" autocomplete="email" required />
@@ -43,6 +44,6 @@ const { id = 'book', source = '', stacked = false } = Astro.props;
     <textarea id={`${id}-notes`} name="notes" rows="3"></textarea>
   </div>
   <div>
-    <button type="submit" class:list={['btn w-full', !stacked && 'md:w-auto']}>{site.cta}</button>
+    <button type="submit" class="btn mt-1 w-full">{site.cta}</button>
   </div>
 </form>

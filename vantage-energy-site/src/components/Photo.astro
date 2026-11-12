@@ -1,19 +1,20 @@
 ---
 // Shows the photo for a named slot. Files live in src/assets/photos/ (see src/data/photos.js).
+// Leave "ratio" off to let the photo fill whatever box it sits in.
 import { Image } from 'astro:assets';
 import { photos } from '../data/photos.js';
 
-const { name, ratio = '3 / 2', sizes = '(min-width: 64rem) 40vw, 100vw', eager = false, class: cls = '' } = Astro.props;
+const { name, ratio, sizes = '(min-width: 64rem) 50vw, 100vw', eager = false, class: cls = '' } = Astro.props;
 const files = import.meta.glob('../assets/photos/*.{jpg,jpeg,png,webp,avif}', { eager: true });
 const match = Object.entries(files).find(([path]) => path.split('/').pop().replace(/\.[^.]+$/, '') === name);
 if (!match) throw new Error(`No photo named "${name}" in src/assets/photos/`);
 ---
-<div class:list={['photo', cls]} style={`aspect-ratio: ${ratio}`}>
+<div class:list={['photo', cls]} style={ratio ? `aspect-ratio: ${ratio}` : undefined}>
   <Image
     src={match[1].default}
     alt={photos[name]?.alt ?? ''}
     format="webp"
-    quality={72}
+    quality={70}
     widths={[480, 768, 1100, 1600]}
     sizes={sizes}
     loading={eager ? 'eager' : 'lazy'}

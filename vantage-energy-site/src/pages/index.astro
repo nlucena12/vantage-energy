@@ -8,6 +8,16 @@ import { site, deadlines } from '../data/site.js';
 
 const firstQuestion = path.questions.find((q) => q.id === path.start);
 
+// The next deadline that has not passed yet (re-checked in the browser too, so it stays right between rebuilds).
+const today = new Date().toISOString().slice(0, 10);
+const nextDue = deadlines.rows.find((r) => r.date >= today) ?? deadlines.rows[deadlines.rows.length - 1];
+
+const promises = [
+  { title: 'One contract', text: 'You sign with Vantage. Not with a list of separate trades.' },
+  { title: 'Licensed, insured contractors', text: 'Work performed by licensed, insured contractors that we hire and manage.' },
+  { title: 'Filed with the City', text: 'We complete the verification and file it. You get a copy.' },
+];
+
 const steps = [
   { title: 'Site walk', text: 'We walk the building, count the light fixtures, and look at the heating and kitchen equipment.' },
   { title: 'Plan and price', text: 'You get one plan in plain English: the compliance path that fits your building, the work involved, and one price.' },
@@ -32,95 +42,38 @@ const yourself = [
 ];
 const withVantage = ['Walk the building with us', 'Approve one plan and one price', 'Sign one agreement'];
 ---
-<Base description="Vantage Energy handles Energize Denver compliance for small commercial and multifamily buildings in Denver. One contract. We handle the rest.">
+<Base dock description="Vantage Energy handles Energize Denver compliance for small commercial and multifamily buildings in Denver. One contract. We handle the rest.">
 
-  <!-- Hero -->
-  <section class="wrap pb-14 pt-10 md:pb-20 md:pt-16">
-    <div class="cols items-center gap-y-10">
-      <div class="col-span-full lg:col-span-7">
-        <h1>Energize Denver compliance for small buildings.</h1>
-        <p class="ui mt-5 text-[1.5rem] font-bold leading-tight md:text-[1.875rem]" style="font-stretch: 112%;">One contract. We handle the rest.</p>
-        <p class="lede measure mt-6">
+  <!-- Hero: headline over the building photo, with question 1 of Find Your Path live in the card -->
+  <section class="hero">
+    <div class="hero-media"><Photo name="hero" sizes="100vw" eager /></div>
+    <div class="wrap cols items-end gap-y-10 pt-10 md:pt-16 lg:pt-24">
+      <div class="col-span-full lg:col-span-7 lg:pb-24">
+        <p class="hero-note" style="border-radius: 0.875rem;">
+          <i></i>
+          <span>Next City deadline: <span data-next-date>{nextDue.day}, {nextDue.year}</span>, for buildings of <span data-next-size>{nextDue.size}</span></span>
+        </p>
+        <h1 class="mt-6">Energize Denver compliance for small buildings.</h1>
+        <p class="wide mt-5 text-[1.375rem] font-bold leading-tight md:text-[1.75rem]" style="color: #f4f6f4;">One contract. We handle the rest.</p>
+        <p class="lede mt-5 max-w-[52ch]">
           If your Denver building is between 5,000 and 24,999 sq ft, the City has an energy rule it has to meet.
           Vantage plans the work, manages the contractors who do it, and files the paperwork.
         </p>
         <div class="mt-8 flex flex-col gap-5 md:flex-row md:items-center md:gap-7">
           <a href="/contact/" class="btn">{site.cta}</a>
-          <a href="/find-your-path/" class="ui font-semibold">See what your building needs</a>
+          <a href="#how" class="link-quiet">See how it works</a>
         </div>
-        <p class="small mt-7 text-soft">Work performed by licensed, insured contractors.</p>
       </div>
+
       <div class="col-span-full lg:col-span-5">
-        <Photo name="hero" ratio="var(--hero-ratio)" class="[--hero-ratio:3/2] lg:[--hero-ratio:4/5]" sizes="(min-width: 64rem) 40vw, 100vw" eager />
-      </div>
-    </div>
-  </section>
-
-  <!-- Does it apply to you? -->
-  <section class="section border-t-2 border-ink">
-    <div class="wrap cols gap-y-12">
-      <div class="col-span-full lg:col-span-6">
-        <h2>Does Energize Denver apply to you?</h2>
-        <p class="measure mt-5">It does if all three of these are true.</p>
-        <ul class="measure mt-5 grid gap-4">
-          {[
-            'The building is in the City and County of Denver.',
-            "It's a commercial or multifamily building.",
-            "It's 5,000 sq ft or larger.",
-          ].map((item) => (
-            <li class="ui relative pl-10 text-[1.1875rem] font-semibold leading-snug">
-              <svg class="absolute left-0 top-0.5 h-6 w-6" viewBox="0 0 24 24" aria-hidden="true"><rect x="1" y="1" width="22" height="22" rx="3" fill="#ffc42e" stroke="#1f2e38" stroke-width="2"/><path d="M6.5 12.5l3.5 3.5 7.5-8" fill="none" stroke="#1f2e38" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-              {item}
-            </li>
-          ))}
-        </ul>
-        <p class="measure mt-7">
-          This site is about small buildings, 5,000 to 24,999 sq ft. They pick one way to comply.
-          For most, that's LED lighting. Some are better off replacing a gas heating unit with a heat pump,
-          and restaurants and condo buildings have their own options.
-        </p>
-        <p class="measure mt-4">Buildings of 25,000 sq ft and larger follow different rules.</p>
-      </div>
-
-      <div class="col-span-full lg:col-span-5 lg:col-start-8">
-        <table class="w-full border-collapse text-left text-[1rem] md:text-[1.125rem]">
-          <caption class="ui mb-3 text-left text-[1.3125rem] font-bold" style="font-stretch: 112%;">When it's due</caption>
-          <thead>
-            <tr class="ui border-b-2 border-ink text-base">
-              <th scope="col" class="py-2 pr-4 font-semibold">Building size</th>
-              <th scope="col" class="py-2 font-semibold">Deadline</th>
-            </tr>
-          </thead>
-          <tbody>
-            {deadlines.rows.map((row) => (
-              <tr class="border-b border-rule">
-                <th scope="row" class="whitespace-nowrap py-3 pr-3 font-normal">{row.size}</th>
-                <td class="ui whitespace-nowrap py-3 font-bold">{row.due}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-        <p class="small mt-4 text-soft">
-          Deadlines as published by the City, checked {deadlines.checked}.{' '}
-          <a href={site.citySmallBuildingsUrl} rel="noopener">Look up your building on energizedenver.org</a>
-        </p>
-        <p class="small ui mt-5 font-semibold">
-          Not sure where your building falls? <a href="/contact/">{site.cta}</a>
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <!-- Find Your Path teaser: question 1 is live -->
-  <section class="section bg-wash">
-    <div class="wrap cols">
-      <div class="col-span-full lg:col-span-9">
-        <h2>Answer up to {path.questions.length} questions, see what your building needs.</h2>
-        <p class="measure mt-5">Start here. Each answer takes you to the next question or to a result.</p>
-        <div class="mt-8 border-2 border-ink bg-paper p-5 md:p-8">
-          <p class="ui text-base font-semibold">Question 1 of {path.questions.length}</p>
-          <h3 class="mt-2 text-[1.5rem] md:text-[1.875rem]" style="line-height: 1.12;">{firstQuestion.text}</h3>
-          <ul class="mt-6 grid gap-3 md:grid-cols-2">
+        <div class="card card-lift hang p-5 md:p-7">
+          <p class="font-bold leading-snug">Answer up to {path.questions.length} questions, see what your building needs.</p>
+          <ol class="progress mt-4" aria-hidden="true">
+            {path.questions.map((_, k) => <li class:list={[k === 0 && 'is-now']}></li>)}
+          </ol>
+          <p class="small mt-4 text-soft">Question 1 of {path.questions.length}</p>
+          <h2 class="mt-1 text-[1.5rem] md:text-[1.75rem]" style="line-height: 1.12;">{firstQuestion.text}</h2>
+          <ul class="mt-5 grid gap-2.5">
             {firstQuestion.answers.map((a) => (
               <li><a class="answer" href={`/find-your-path/#${a.goto}`}>{a.label}</a></li>
             ))}
@@ -130,15 +83,71 @@ const withVantage = ['Walk the building with us', 'Approve one plan and one pric
     </div>
   </section>
 
-  <!-- How it works -->
+  <!-- What you get -->
+  <section class="after-hang pb-4">
+    <div class="wrap">
+      <ul class="grid gap-x-8 gap-y-7 md:grid-cols-3">
+        {promises.map((p) => (
+          <li class="border-t-[3px] border-ink pt-4">
+            <h2 class="text-[1.25rem]" style="font-stretch: 110%; letter-spacing: -0.01em; line-height: 1.2;">{p.title}</h2>
+            <p class="mt-2 max-w-[38ch] text-soft">{p.text}</p>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+
+  <!-- Does it apply to you? -->
   <section class="section">
+    <div class="wrap cols gap-y-12">
+      <div class="col-span-full lg:col-span-6">
+        <h2>Does Energize Denver apply to you?</h2>
+        <p class="lede mt-5">It does if all three of these are true.</p>
+        <ul class="checks mt-6 text-[1.125rem] font-semibold">
+          <li>The building is in the City and County of Denver.</li>
+          <li>It's a commercial or multifamily building.</li>
+          <li>It's 5,000 sq ft or larger.</li>
+        </ul>
+        <p class="measure mt-8">
+          This site is about small buildings, 5,000 to 24,999 sq ft. They pick one way to comply.
+          For most, that's LED lighting. Some are better off replacing a gas heating unit with a heat pump,
+          and restaurants and condo buildings have their own options.
+        </p>
+        <p class="measure mt-4 text-soft">Buildings of 25,000 sq ft and larger follow different rules.</p>
+      </div>
+
+      <div class="col-span-full lg:col-span-5 lg:col-start-8">
+        <h3 class="text-[1.375rem]">When it's due</h3>
+        <ol class="due mt-5" data-deadlines>
+          {deadlines.rows.map((row) => (
+            <li class:list={[row === nextDue && 'is-next']} data-date={row.date} data-day={`${row.day}, ${row.year}`} data-size={row.size}>
+              <span class="chip flag">Next deadline</span>
+              <span class="year">{row.year}</span>
+              <span class="day">{row.day}</span>
+              <span class="size">{row.size}</span>
+            </li>
+          ))}
+        </ol>
+        <p class="small mt-4 text-soft">
+          Deadlines as published by the City, checked {deadlines.checked}.{' '}
+          <a href={site.citySmallBuildingsUrl} rel="noopener">Look up your building on energizedenver.org</a>
+        </p>
+        <p class="small mt-4 font-semibold">
+          Not sure where your building falls? <a href="/contact/">{site.cta}</a>
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section class="dark plan-grid section" id="how">
     <div class="wrap">
       <h2>How it works</h2>
-      <ol class="route mt-10">
+      <ol class="route mt-12">
         {steps.map((s) => (
           <li>
             <h3>{s.title}</h3>
-            <p class="mt-2 max-w-[38ch]">{s.text}</p>
+            <p class="mt-2 max-w-[36ch]">{s.text}</p>
           </li>
         ))}
       </ol>
@@ -147,64 +156,63 @@ const withVantage = ['Walk the building with us', 'Approve one plan and one pric
   </section>
 
   <!-- Services -->
-  <section class="section border-t-2 border-ink">
+  <section class="section">
     <div class="wrap">
       <h2>What we do</h2>
-      <div class="mt-10 grid gap-x-8 gap-y-12 md:grid-cols-2">
+      <p class="lede measure mt-4 text-soft">Four kinds of work, one company responsible for all of it.</p>
+    </div>
+    <div class="mx-auto mt-9 w-full max-w-[76rem] md:px-8">
+      <ul class="rail" tabindex="0" aria-label="Services">
         {services.map((s) => (
-          <article>
-            <Photo name={s.photo} ratio="3 / 2" sizes="(min-width: 48rem) 45vw, 100vw" />
-            <h3 class="mt-5">{s.title}</h3>
-            <p class="mt-2 max-w-[52ch]">{s.text}</p>
-          </article>
+          <li>
+            <article class="svc">
+              <Photo name={s.photo} sizes="(min-width: 48rem) 45vw, 82vw" />
+              <div class="svc-body">
+                <h3>{s.title}</h3>
+                <p>{s.text}</p>
+              </div>
+            </article>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   </section>
 
   <!-- Incentives: this sentence is the only promise we make about incentives. -->
-  <section class="section bg-wash">
-    <div class="wrap cols">
-      <div class="col-span-full lg:col-span-9">
-        <h2>Incentives</h2>
-        <p class="mt-5 max-w-[34ch] text-[1.5rem] leading-snug md:text-[1.875rem]">
-          We find the incentives currently available to your building and structure the project to make the most of them.
-        </p>
-      </div>
+  <section class="bg-tag">
+    <div class="wrap py-14 md:py-20">
+      <h2 class="text-[1.125rem]" style="font-stretch: 110%; letter-spacing: 0;">Incentives</h2>
+      <p class="mt-4 max-w-[26ch] text-[1.75rem] font-extrabold md:text-[2.75rem]" style="font-stretch: 116%; line-height: 1.1; letter-spacing: -0.02em;">
+        We find the incentives currently available to your building and structure the project to make the most of them.
+      </p>
     </div>
   </section>
 
   <!-- One contract -->
   <section class="section">
     <div class="wrap">
-      <h2 class="max-w-[20ch]">Why one contract beats juggling contractors</h2>
-      <div class="cols mt-10 gap-y-10">
-        <div class="col-span-full md:col-span-4 lg:col-span-6">
+      <h2 class="max-w-[24ch]">Why one contract beats juggling contractors</h2>
+      <div class="cols mt-10 items-start gap-y-6">
+        <div class="col-span-full rounded-3xl border-[1.5px] border-dashed border-soft/50 p-6 md:col-span-4 md:p-8 lg:col-span-6">
           <h3>If you run the project yourself</h3>
-          <ul class="mt-4 grid gap-3">
-            {yourself.map((item) => (
-              <li class="relative max-w-[44ch] pl-7 before:absolute before:left-0 before:top-[0.75em] before:h-0.5 before:w-4 before:bg-ink">{item}</li>
-            ))}
+          <ul class="dashes mt-5">
+            {yourself.map((item) => <li>{item}</li>)}
           </ul>
         </div>
-        <div class="col-span-full md:col-span-4 lg:col-span-5 lg:col-start-8">
-          <div class="border-2 border-ink p-5 md:p-7">
-            <h3>With Vantage</h3>
-            <ul class="mt-4 grid gap-3">
-              {withVantage.map((item) => (
-                <li class="relative pl-7 before:absolute before:left-0 before:top-[0.55em] before:h-2.5 before:w-4 before:border-y-2 before:border-ink before:bg-tag">{item}</li>
-              ))}
-            </ul>
-            <p class="mt-5">We handle everything in the other list.</p>
-            <p class="mt-6"><a href="/contact/" class="btn w-full">{site.cta}</a></p>
-          </div>
+        <div class="dark col-span-full rounded-3xl p-6 shadow-lift md:col-span-4 md:p-8 lg:col-span-6">
+          <h3>With Vantage</h3>
+          <ul class="checks mt-5 text-[1.125rem] font-semibold">
+            {withVantage.map((item) => <li>{item}</li>)}
+          </ul>
+          <p class="mt-6">We handle everything in the other list.</p>
+          <p class="mt-6"><a href="/contact/" class="btn w-full">{site.cta}</a></p>
         </div>
       </div>
     </div>
   </section>
 
   <!-- FAQ -->
-  <section class="section border-t-2 border-ink">
+  <section class="section bg-wash">
     <div class="wrap cols gap-y-8">
       <h2 class="col-span-full lg:col-span-4">Common questions</h2>
       <div class="faq col-span-full lg:col-span-8">
@@ -249,16 +257,32 @@ const withVantage = ['Walk the building with us', 'Approve one plan and one pric
   </section>
 
   <!-- Final call to action -->
-  <section class="band section" id="book">
-    <div class="wrap cols gap-y-10">
-      <div class="col-span-full lg:col-span-5">
+  <section class="dark plan-grid section" id="book">
+    <div class="wrap cols items-center gap-y-10">
+      <div class="col-span-full lg:col-span-6">
         <h2>{site.cta}</h2>
         <p class="lede mt-5 max-w-[36ch]">Tell us about the building. We look it up in the City's records and get back to you.</p>
-        <p class="small mt-6 max-w-[40ch]">Rather start with a few questions? <a href="/find-your-path/">Find your path</a></p>
+        <p class="small mt-6 max-w-[40ch]">Rather start with a few questions? <a href="/find-your-path/" style="color: #f4f6f4;">Find your path</a></p>
       </div>
-      <div class="col-span-full lg:col-span-6 lg:col-start-7">
-        <BookingForm id="home" source="home" />
+      <div class="col-span-full lg:col-span-6">
+        <div class="card card-lift p-5 md:p-8">
+          <BookingForm id="home" source="home" />
+        </div>
       </div>
     </div>
   </section>
 </Base>
+
+<script is:inline>
+  // Keep "next deadline" correct after a deadline passes, even if the site hasn't been rebuilt.
+  (function () {
+    var rows = [].slice.call(document.querySelectorAll('[data-deadlines] li'));
+    if (!rows.length) return;
+    var today = new Date().toISOString().slice(0, 10);
+    var next = rows.filter(function (r) { return r.dataset.date >= today; })[0] || rows[rows.length - 1];
+    rows.forEach(function (r) { r.classList.toggle('is-next', r === next); });
+    var d = document.querySelector('[data-next-date]'), s = document.querySelector('[data-next-size]');
+    if (d) d.textContent = next.dataset.day;
+    if (s) s.textContent = next.dataset.size;
+  })();
+</script>

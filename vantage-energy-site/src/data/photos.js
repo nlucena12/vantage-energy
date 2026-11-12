@@ -13,7 +13,7 @@
   led         CHUTTERSNAP                      https://unsplash.com/photos/BNBA1h-NgdY
   heat-pump   Illia Horokhovsky                https://unsplash.com/photos/YmouSi40T3Q
   kitchen     Ricardo Gomez Angel              https://unsplash.com/photos/rO6709B116E
-  filings     Agustin Pimentel                 https://unsplash.com/photos/ecv_knkA24w
+  filings     [PLACEHOLDER: photographer / Unsplash URL for the desk photo now in use]
   about       Colin Lloyd, Denver              https://unsplash.com/photos/hAZVYvkEbxk
 */
 export const photos = {
@@ -21,6 +21,6 @@ export const photos = {
   led: { alt: 'Rows of linear light fixtures above warehouse shelving' },
   'heat-pump': { alt: 'A row of outdoor heating and cooling units on a rooftop' },
   kitchen: { alt: 'Stainless steel equipment in a commercial kitchen' },
-  filings: { alt: 'A worker in a safety vest filling out paperwork on site' },
+  filings: { alt: 'Hands filling out a paper form at a desk' },
   about: { alt: 'A red brick building on a snowy Denver street' },
 };

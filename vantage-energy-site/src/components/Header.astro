@@ -7,24 +7,25 @@ const links = [
 ];
 const here = Astro.url.pathname.replace(/\/?$/, '/');
 ---
-<header class="border-b-2 border-ink">
-  <div class="wrap flex items-center justify-between gap-4 py-3 md:py-4">
-    <a href="/" class="ui whitespace-nowrap text-[1.3125rem] font-extrabold leading-none no-underline" style="font-stretch: 122%; letter-spacing: -0.01em;">
+<header class="site-header">
+  <div class="wrap flex items-center justify-between gap-4 py-3">
+    <a href="/" class="brand" aria-label={`${site.name} home`}>
+      <svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="8" fill="#ffc42e"/><path d="M7.5 9.5h5.2l3.3 9 3.3-9h5.2L18.2 24h-4.4z" fill="#15212a"/></svg>
       {site.name}
     </a>
 
-    <nav aria-label="Main" class="ui hidden items-center gap-7 text-base font-semibold lg:flex">
+    <nav aria-label="Main" class="hidden items-center gap-8 lg:flex">
       {links.map((l) => (
-        <a href={l.href} aria-current={here === l.href ? 'page' : undefined} class:list={['no-underline hover:underline', here === l.href && 'underline']}>{l.label}</a>
+        <a href={l.href} class="nav-link" aria-current={here === l.href ? 'page' : undefined}>{l.label}</a>
       ))}
       <a href="/contact/" class="btn btn-compact">{site.cta}</a>
     </nav>
 
     <details class="relative lg:hidden">
-      <summary class="ui flex min-h-11 list-none items-center rounded border-2 border-ink px-3 text-base font-bold [&::-webkit-details-marker]:hidden">Menu</summary>
-      <nav aria-label="Main" class="ui absolute right-0 top-full z-20 mt-2 grid w-[min(20rem,calc(100vw-2rem))] gap-1 border-2 border-ink bg-paper p-3 text-lg font-semibold">
+      <summary class="menu-btn">Menu</summary>
+      <nav aria-label="Main" class="menu-panel card card-lift">
         {links.map((l) => (
-          <a href={l.href} aria-current={here === l.href ? 'page' : undefined} class="flex min-h-12 items-center px-2 no-underline hover:underline">{l.label}</a>
+          <a href={l.href} aria-current={here === l.href ? 'page' : undefined}>{l.label}</a>
         ))}
         <a href="/contact/" class="btn mt-2">{site.cta}</a>
       </nav>
